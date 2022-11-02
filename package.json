@@ -1,6 +1,6 @@
 {
   "name": "@indoomni/strapi-plugin-whatsapp-web",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Wrapper for whatsapp-web.js library to be used with Strapi apps.",
   "strapi": {
     "name": "whatsapp-web",
