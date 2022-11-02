@@ -20,6 +20,17 @@ module.exports = {
   },
   validator: config => {
     try {
+      // Check if registered handler is available..
+      const { clientId, handler } = config;
+      const dirname = strapi.dirs.dist.src;
+      const handlerFilename = `${dirname}/${handler}`;
+      require(handlerFilename);
+      console.log(
+        `WhatsApp web ${util.inspect(
+          clientId,
+        )} configuration is valid!`,
+      );
+
       // Check if Chromium is available..
       var exec = require('child_process').exec;
       console.log('Running chromium --version..');
@@ -41,17 +52,6 @@ module.exports = {
           throw new Error();
         }
       });
-
-      // Check if registered handler is available..
-      const { clientId, handler } = config;
-      const dirname = strapi.dirs.dist.src;
-      const handlerFilename = `${dirname}/${handler}`;
-      require(handlerFilename);
-      console.log(
-        `WhatsApp web ${util.inspect(
-          clientId,
-        )} configuration is valid!`,
-      );
 
       // Everything's okay!
       strapi.whatsapp = {
