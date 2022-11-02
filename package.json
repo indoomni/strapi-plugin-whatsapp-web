@@ -1,0 +1,42 @@
+{
+  "name": "@indoomni/strapi-plugin-firebase-whatsapp-web",
+  "version": "1.0.0",
+  "description": "Wrapper for whatsapp-web.js library to be used with Strapi apps.",
+  "strapi": {
+    "name": "whatsapp-web",
+    "description": "Wrapper for pedroslopez's [whatsapp-web.js](https://www.npmjs.com/package/whatsapp-web.js) library to be used with Strapi apps.",
+    "kind": "plugin",
+    "displayName": "Strapi whatsapp-web.js library wrapper"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@strapi/strapi": "^4.0.0"
+  },
+  "author": "Iman Sjamhudi <indoomni@gmail.com>",
+  "maintainers": [
+    "Iman Sjamhudi <indoomni@gmail.com>"
+  ],
+  "engines": {
+    "node": ">=14.19.1 <=18.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT",
+  "main": "strapi-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/indoomni/strapi-plugin-whatsapp-web.git"
+  },
+  "keywords": [
+    "strapi",
+    "plugin",
+    "whatsapp",
+    "whatsapp-web"
+  ],
+  "bugs": {
+    "url": "https://github.com/indoomni/strapi-plugin-whatsapp-web/issues"
+  },
+  "homepage": "https://github.com/indoomni/strapi-plugin-whatsapp-web#readme"
+}
