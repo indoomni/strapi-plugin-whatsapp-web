@@ -154,6 +154,7 @@ module.exports = ({ strapi }) => ({
         }
       }
     });
+
     return strapi.whatsapp.client.initialize();
   },
   deinit: async () => {},

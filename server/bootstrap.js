@@ -14,6 +14,7 @@ module.exports = async ({ strapi }) => {
     ) {
       // Do anything..?
     }
+
     strapi.log.info(
       `Bootstrapped WhatsApp web: ${strapi.inspect(
         config.clientId,
