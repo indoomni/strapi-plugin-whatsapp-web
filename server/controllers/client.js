@@ -178,16 +178,12 @@ module.exports = ({ strapi }) => ({
     // Hack to comply with WhatsApp's WID format..
     msisdn = (msisdn + '@c.us').substring(1);
 
-    try {
-      if (media) {
-        strapi.whatsapp.client.sendMessage(msisdn, media, {
-          caption: message,
-        });
-      } else {
-        strapi.whatsapp.client.sendMessage(msisdn, message);
-      }
-    } catch (err) {
-      strapi.log.debug('📺: ', err);
+    if (media) {
+      strapi.whatsapp.client.sendMessage(msisdn, media, {
+        caption: message,
+      });
+    } else {
+      strapi.whatsapp.client.sendMessage(msisdn, message);
     }
 
     return 'ok';
