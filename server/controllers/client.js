@@ -27,8 +27,9 @@ module.exports = ({ strapi }) => ({
     // Set up a watchdog..
     setTimeout(async () => {
       if (
-        !strapi.whatsapp.client.isAuthenticated ||
-        !strapi.whatsapp.client.isReady
+        !strapi.whatsapp.client.qr &&
+        (!strapi.whatsapp.client.isAuthenticated ||
+          !strapi.whatsapp.client.isReady)
       ) {
         console.error(
           'WhatsApp web client not authenticated and ready within one minute. Restarting..',
@@ -46,6 +47,7 @@ module.exports = ({ strapi }) => ({
     } catch (err) {}
 
     strapi.whatsapp.client.on('qr', qr => {
+      strapi.whatsapp.client.qr = qr;
       let propagate = true;
       try {
         propagate = handler.onQr(qr);
@@ -164,7 +166,6 @@ module.exports = ({ strapi }) => ({
     media = undefined,
     data = undefined,
   ) => {
-    console.log('--send', msisdn);
     if (!msisdn) return;
 
     const number = phoneUtil.parseAndKeepRawInput(
@@ -177,6 +178,7 @@ module.exports = ({ strapi }) => ({
     msisdn = phoneUtil.format(number, PNF.E164);
     // Hack to comply with WhatsApp's WID format..
     msisdn = (msisdn + '@c.us').substring(1);
+    console.log('--send', msisdn);
 
     if (media) {
       strapi.whatsapp.client.sendMessage(msisdn, media, {
