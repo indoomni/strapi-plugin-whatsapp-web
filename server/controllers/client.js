@@ -25,18 +25,18 @@ module.exports = ({ strapi }) => ({
     });
 
     // Set up a watchdog..
-    setTimeout(async () => {
-      if (
-        !strapi.whatsapp.client.qr &&
-        (!strapi.whatsapp.client.isAuthenticated ||
-          !strapi.whatsapp.client.isReady)
-      ) {
-        console.error(
-          'WhatsApp web client not authenticated and ready within one minute. Restarting..',
-        );
-        process.exit();
-      }
-    }, 60000);
+    // setTimeout(async () => {
+    //   if (
+    //     !strapi.whatsapp.client.qr &&
+    //     (!strapi.whatsapp.client.isAuthenticated ||
+    //       !strapi.whatsapp.client.isReady)
+    //   ) {
+    //     console.error(
+    //       'WhatsApp web client not authenticated and ready within one minute. Restarting..',
+    //     );
+    //     process.exit();
+    //   }
+    // }, 60000);
 
     let { clientId, handler, test } = config;
     const dirname = strapi.dirs.dist.src;

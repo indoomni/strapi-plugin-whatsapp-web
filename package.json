@@ -1,6 +1,6 @@
 {
   "name": "@indoomni/strapi-plugin-whatsapp-web",
-  "version": "1.0.7",
+  "version": "1.0.13",
   "description": "Wrapper for whatsapp-web.js library to be used with Strapi apps.",
   "strapi": {
     "name": "whatsapp-web",
@@ -14,7 +14,7 @@
     "qrcode-terminal": "^0.12.0",
     "util": "^0.12.5",
     "uuid": "^9.0.0",
-    "whatsapp-web.js": "^1.18.2"
+    "whatsapp-web.js": "^1.18.3"
   },
   "peerDependencies": {
     "@strapi/strapi": "^4.0.0"
