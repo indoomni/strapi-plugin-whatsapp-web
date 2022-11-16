@@ -1,10 +1,5 @@
 'use strict';
 
-const { v4: uuidv4 } = require('uuid');
-const PNF = require('google-libphonenumber')
-  .PhoneNumberFormat;
-const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
-
 const {
   Buttons,
   Client,
@@ -25,30 +20,33 @@ const _inspectMessage = msg => {
 module.exports = ({ strapi }) => ({
   init: async config => {
     console.log('WhatsApp Web library --init');
+    if (strapi.whatsapp.client) {
+      delete strapi.whatsapp.client.loadingPercent;
+      delete strapi.whatsapp.client.loadingMessage;
+      delete strapi.whatsapp.client.qr;
+      delete strapi.whatsapp.client.isAuthenticated;
+      delete strapi.whatsapp.client.isReady;
+    }
 
+    console.log('Initializing WhatsApp Web library..');
     strapi.whatsapp.client = new Client({
       authStrategy: new LocalAuth({
         clientId: config.clientId,
         dataPath: '/opt/app/.wwebjs_auth',
       }),
       puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-extensions',
+          '--disable-gpu',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--disable-dev-shm-usage',
+        ],
       },
     });
-
-    // Set up a watchdog..
-    // setTimeout(async () => {
-    //   if (
-    //     !strapi.whatsapp.client.qr &&
-    //     (!strapi.whatsapp.client.isAuthenticated ||
-    //       !strapi.whatsapp.client.isReady)
-    //   ) {
-    //     console.error(
-    //       'WhatsApp web client not authenticated and ready within one minute. Restarting..',
-    //     );
-    //     process.exit();
-    //   }
-    // }, 60000);
 
     let { clientId, handler, test } = config;
     const dirname = strapi.dirs.dist.src;
@@ -65,9 +63,8 @@ module.exports = ({ strapi }) => ({
     strapi.whatsapp.client.on(
       'loading_screen',
       async (percent, message) => {
-        // strapi.whatsapp.client.loading = true;
-        // strapi.whatsapp.client.loadingPercent = percent;
-        // strapi.whatsapp.client.loadingMessage = message;
+        strapi.whatsapp.client.loadingPercent = percent;
+        strapi.whatsapp.client.loadingMessage = message;
         let propagate = true;
         try {
           propagate = await handler.onLoading(
@@ -176,8 +173,6 @@ module.exports = ({ strapi }) => ({
     strapi.whatsapp.client.on(
       'disconnected',
       async reason => {
-        strapi.whatsapp.client.isAuthenticated = false;
-        strapi.whatsapp.client.isReady = false;
         let propagate = true;
         try {
           propagate = await handler.onDisconnected(reason);
@@ -356,37 +351,31 @@ module.exports = ({ strapi }) => ({
             let info = strapi.whatsapp.client.info;
             strapi.whatsapp.client.sendMessage(
               msg.from,
-              `
-*Connection info*
+              `*Connection info*
 User name: ${info.pushname}
 My number: ${info.wid.user}
-Platform: ${info.platform}
-            `,
+Platform: ${info.platform}`,
             );
           } else if (
             msg.body === '!mediainfo' &&
             msg.hasMedia
           ) {
             const attachmentData = await msg.downloadMedia();
-            msg.reply(`
-*Media info*
+            msg.reply(`*Media info*
 MimeType: ${attachmentData.mimetype}
 Filename: ${attachmentData.filename}
-Data (length): ${attachmentData.data.length}
-            `);
+Data (length): ${attachmentData.data.length}`);
           } else if (
             msg.body === '!quoteinfo' &&
             msg.hasQuotedMsg
           ) {
             const quotedMsg = await msg.getQuotedMessage();
-            quotedMsg.reply(`
-*Quoted message info*
+            quotedMsg.reply(`*Quoted message info*
 ID: ${quotedMsg.id._serialized}
 Type: ${quotedMsg.type}
 Author: ${quotedMsg.author || quotedMsg.from}
 Timestamp: ${quotedMsg.timestamp}
-Has Media? ${quotedMsg.hasMedia}
-            `);
+Has Media? ${quotedMsg.hasMedia}`);
           } else if (
             msg.body === '!resendmedia' &&
             msg.hasQuotedMsg
@@ -540,14 +529,12 @@ Has Media? ${quotedMsg.hasMedia}
           } else if (msg.body === '!groupinfo') {
             let chat = await msg.getChat();
             if (chat.isGroup) {
-              msg.reply(`
-*Group Details*
+              msg.reply(`*Group Details*
 Name: ${chat.name}
 Description: ${chat.description}
 Created At: ${chat.createdAt.toString()}
 Created By: ${chat.owner.user}
-Participant count: ${chat.participants.length}
-                `);
+Participant count: ${chat.participants.length}`);
             } else {
               msg.reply(
                 'This command can only be used in a group!',
@@ -675,29 +662,23 @@ Participant count: ${chat.participants.length}
   deinit: async () => {
     console.log('WhatsApp Web library --deinit');
   },
-  sendMessage: async (msisdn, content, options = {}) => {
-    if (!msisdn) return;
-
-    let number = phoneUtil.parseAndKeepRawInput(
-      msisdn,
-      'ID',
-    );
-    if (!phoneUtil.isValidNumber(number)) {
-      console.warn(`MSISDN ${number} is not Indonesian!`);
-    }
-    number = phoneUtil.format(number, PNF.E164);
-    number = (number + '@c.us').substring(1);
-
+  sendMessage: async (number, content, options = {}) => {
     console.log(
       `WhatsApp Web library --send Sending message to ${number}..`,
     );
-    // console.log('Media:', media);
-    await strapi.whatsapp.client.sendMessage(
-      number,
-      content,
-      options,
-    );
-    console.log(`--> Sent!`);
+
+    if (number) {
+      await strapi.whatsapp.client.sendMessage(
+        number,
+        content,
+        options,
+      );
+      console.log(`++++ Sent!`);
+    } else {
+      console.log(
+        `---- ${msisdn} is not registered as a WhatsApp number`,
+      );
+    }
 
     return 'ok';
   },
