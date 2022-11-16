@@ -33,7 +33,7 @@ module.exports = {
 
       // Check if Chromium is available..
       var exec = require('child_process').exec;
-      console.log('Running chromium --version..');
+      console.log('Checking if Chromium exists..');
       var child = exec('chromium --version', function(
         error,
         stdout,
@@ -46,7 +46,7 @@ module.exports = {
         }
 
         if (stdout && stdout.startsWith('Chromium')) {
-          // console.log('Chromium is available');
+          console.log('Chromium is available', stdout);
         } else {
           console.error('Chromium is not available');
           throw new Error();
